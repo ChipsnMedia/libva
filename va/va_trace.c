@@ -1176,7 +1176,7 @@ static void va_CNMIvfFormatCreate(struct trace_context *trace_ctx, VASurfaceID *
     char *value;
     int i;
 #ifdef USE_CNM_TRACE_DEBUG
-    printf("+%s trace_ctx=%p\n", __FUNCTION__, trace_ctx);
+    printf("+%s trace_ctx=%p, num_render_targets=%d\n", __FUNCTION__, trace_ctx, num_render_targets);
 #endif
     if (!trace_ctx) {
         return;
@@ -1202,6 +1202,9 @@ static void va_CNMIvfFormatCreate(struct trace_context *trace_ctx, VASurfaceID *
     trace_ctx->num_render_targets = num_render_targets;
     memset(trace_ctx->ivf_render_targets, 0x00, sizeof(trace_ctx->ivf_render_targets));
     for (i=0; i <trace_ctx->num_render_targets; i++) {
+#ifdef USE_CNM_TRACE_DEBUG
+        printf("    render_tagets[%d] = 0x%08x \n", i, render_targets[i]);
+#endif
         trace_ctx->ivf_render_targets[i] = render_targets[i];
     }
     trace_ctx->ivf_frame_rate = 0;
@@ -1235,28 +1238,8 @@ static uint32_t VASurfaceIDToIndex(struct trace_context *trace_ctx, VASurfaceID 
 }
 static void * VASurfaceIDToIndexInParameterBuffer(struct trace_context *trace_ctx, VABufferType type, void *data, unsigned int size)
 {
-    bool isRext = false;
-    bool isScc = false;
     void *new_data = NULL;
 
-    if (trace_ctx->trace_profile == VAProfileHEVCMain12 || 
-        trace_ctx->trace_profile == VAProfileHEVCMain422_10 || 
-        trace_ctx->trace_profile == VAProfileHEVCMain422_12 || 
-        trace_ctx->trace_profile == VAProfileHEVCMain444    || 
-        trace_ctx->trace_profile == VAProfileHEVCMain444_10 || 
-        trace_ctx->trace_profile == VAProfileHEVCMain444_12 || 
-        trace_ctx->trace_profile == VAProfileHEVCSccMain    || 
-        trace_ctx->trace_profile == VAProfileHEVCSccMain10  || 
-        trace_ctx->trace_profile == VAProfileHEVCSccMain444 || 
-        trace_ctx->trace_profile == VAProfileHEVCSccMain444_10) {
-            isRext = true;
-        }
-    if (trace_ctx->trace_profile == VAProfileHEVCSccMain || 
-        trace_ctx->trace_profile == VAProfileHEVCSccMain10 || 
-        trace_ctx->trace_profile == VAProfileHEVCSccMain444 || 
-        trace_ctx->trace_profile == VAProfileHEVCSccMain444_10) {
-        isScc = true;
-    };
     switch (trace_ctx->trace_profile) {
     case VAProfileMPEG2Simple:
     case VAProfileMPEG2Main:
@@ -1395,62 +1378,149 @@ static void * VASurfaceIDToIndexInParameterBuffer(struct trace_context *trace_ct
     case VAProfileHEVCSccMain10:
     case VAProfileHEVCSccMain444:
     case VAProfileHEVCSccMain444_10:
-        // va_TraceVAPictureParameterBufferHEVC(dpy, context, buffer, type, size, num_elements, pbuf);
-        if (type == VAPictureParameterBufferType) {
-            new_data = calloc(size, 1); 
-            if (new_data) {
-                VAPictureParameterBufferHEVC *p = NULL;
-                VAPictureParameterBufferHEVCRext *pRext = NULL;
-                VAPictureParameterBufferHEVCScc *pScc = NULL;
-                int i;
-                memcpy(new_data, data, size);
-                if (isRext) {
-                    p = &((VAPictureParameterBufferHEVCExtension*)new_data)->base;
-                    pRext = &((VAPictureParameterBufferHEVCExtension*)new_data)->rext;
-                    if (pRext) { // avoid build error
-                        pRext->range_extension_pic_fields.value = pRext->range_extension_pic_fields.value;
-                    }
+        {
 
-                    if (isScc) { // avoid build error
-                        pScc = &((VAPictureParameterBufferHEVCExtension*)new_data)->scc;
-                        pScc->screen_content_pic_fields.value = pScc->screen_content_pic_fields.value;
-                    }
-                } else {
-                    p = (VAPictureParameterBufferHEVC*)new_data;
+            bool isRext = false;
+            bool isScc = false;
+
+            if (trace_ctx->trace_profile == VAProfileHEVCMain12 || 
+                trace_ctx->trace_profile == VAProfileHEVCMain422_10 || 
+                trace_ctx->trace_profile == VAProfileHEVCMain422_12 || 
+                trace_ctx->trace_profile == VAProfileHEVCMain444    || 
+                trace_ctx->trace_profile == VAProfileHEVCMain444_10 || 
+                trace_ctx->trace_profile == VAProfileHEVCMain444_12 || 
+                trace_ctx->trace_profile == VAProfileHEVCSccMain    || 
+                trace_ctx->trace_profile == VAProfileHEVCSccMain10  || 
+                trace_ctx->trace_profile == VAProfileHEVCSccMain444 || 
+                trace_ctx->trace_profile == VAProfileHEVCSccMain444_10) {
+                    isRext = true;
                 }
+            if (trace_ctx->trace_profile == VAProfileHEVCSccMain || 
+                trace_ctx->trace_profile == VAProfileHEVCSccMain10 || 
+                trace_ctx->trace_profile == VAProfileHEVCSccMain444 || 
+                trace_ctx->trace_profile == VAProfileHEVCSccMain444_10) {
+                isScc = true;
+            };
+            // va_TraceVAPictureParameterBufferHEVC(dpy, context, buffer, type, size, num_elements, pbuf);
+            if (type == VAPictureParameterBufferType) {
+                new_data = calloc(size, 1); 
+                if (new_data) {
+                    VAPictureParameterBufferHEVC *p = NULL;
+                    VAPictureParameterBufferHEVCRext *pRext = NULL;
+                    VAPictureParameterBufferHEVCScc *pScc = NULL;
+                    int i;
+                    memcpy(new_data, data, size);
+                    if (isRext) {
+                        p = &((VAPictureParameterBufferHEVCExtension*)new_data)->base;
+                        pRext = &((VAPictureParameterBufferHEVCExtension*)new_data)->rext;
+                        if (pRext) { // avoid build error
+                            pRext->range_extension_pic_fields.value = pRext->range_extension_pic_fields.value;
+                        }
 
-#ifdef USE_CNM_TRACE_DEBUG
-                printf("+%s picture_id=%d\n", __FUNCTION__, p->CurrPic.picture_id);
-#endif
-                p->CurrPic.picture_id = VASurfaceIDToIndex(trace_ctx, p->CurrPic.picture_id);
-#ifdef USE_CNM_TRACE_DEBUG
-                printf("-%s picture_id=%d\n", __FUNCTION__, p->CurrPic.picture_id);
-#endif
-                for (i = 0; i < 15; i++) {
-                    if ((p->ReferenceFrames[i].picture_id != VA_INVALID_SURFACE)) {
-                        p->ReferenceFrames[i].picture_id = VASurfaceIDToIndex(trace_ctx, p->ReferenceFrames[i].picture_id);
+                        if (isScc) { // avoid build error
+                            pScc = &((VAPictureParameterBufferHEVCExtension*)new_data)->scc;
+                            pScc->screen_content_pic_fields.value = pScc->screen_content_pic_fields.value;
+                        }
+                    } else {
+                        p = (VAPictureParameterBufferHEVC*)new_data;
+                    }
+
+    #ifdef USE_CNM_TRACE_DEBUG
+                    printf("+%s picture_id=%d\n", __FUNCTION__, p->CurrPic.picture_id);
+    #endif
+                    p->CurrPic.picture_id = VASurfaceIDToIndex(trace_ctx, p->CurrPic.picture_id);
+    #ifdef USE_CNM_TRACE_DEBUG
+                    printf("-%s picture_id=%d\n", __FUNCTION__, p->CurrPic.picture_id);
+    #endif
+                    for (i = 0; i < 15; i++) {
+                        if ((p->ReferenceFrames[i].picture_id != VA_INVALID_SURFACE)) {
+                            p->ReferenceFrames[i].picture_id = VASurfaceIDToIndex(trace_ctx, p->ReferenceFrames[i].picture_id);
+                        }
                     }
                 }
             }
         }
+
         break;
     case VAProfileVP9Profile0:
     case VAProfileVP9Profile1:
     case VAProfileVP9Profile2:
     case VAProfileVP9Profile3:
-        // for (j=0; j<num_elements; j++) {
-        //     va_TraceMsg(trace_ctx, "\telement[%d] = \n", j);
-
+     if (type == VAPictureParameterBufferType) {
+            new_data = malloc(size); 
+            if (new_data) {
+                VADecPictureParameterBufferVP9 *p;
+                int i;
+                memcpy(new_data, data, size);
+                p = (VADecPictureParameterBufferVP9*)new_data;
+#ifdef USE_CNM_TRACE_DEBUG
+                printf("+%s VP9 reference_frames[8] = \n", __FUNCTION__);
+#endif
+                for (i = 0; i < 8; i++) {
+#ifdef USE_CNM_TRACE_DEBUG
+                    printf("    bf.reference_frames[%d] = 0x%08x\n", i, p->reference_frames[i]);
+#endif
+                    p->reference_frames[i] = VASurfaceIDToIndex(trace_ctx, p->reference_frames[i]);
+#ifdef USE_CNM_TRACE_DEBUG
+                    printf("    af.reference_frames[%d] = 0x%08x\n", i, p->reference_frames[i]);
+#endif
+                }
+            }
+        }
         //     va_TraceVP9Buf(dpy, context, buffers[i], type, size, num_elements, pbuf + size*j);
-        // }
         break;
     case VAProfileAV1Profile0:
     case VAProfileAV1Profile1:
-        // for (j=0; j<num_elements; j++) {
-        //     va_TraceMsg(trace_ctx, "\telement[%d] = \n", j);
+        if (type == VAPictureParameterBufferType) {
+            new_data = malloc(size); 
+            if (new_data) {
+                VADecPictureParameterBufferAV1 *p;
+                int i;
+                memcpy(new_data, data, size);
+                p = (VADecPictureParameterBufferAV1*)new_data;
+#ifdef USE_CNM_TRACE_DEBUG
+                printf("%s bf.current_frame=0x%x\n", __FUNCTION__, p->current_frame);
+#endif
+                p->current_frame = VASurfaceIDToIndex(trace_ctx, p->current_frame);
+#ifdef USE_CNM_TRACE_DEBUG
+                printf("%s af.current_frame=0x%x\n", __FUNCTION__, p->current_frame);
+#endif
+#ifdef USE_CNM_TRACE_DEBUG
+                printf("%s bf.current_display_picture=0x%x\n", __FUNCTION__, p->current_display_picture);
+#endif
+                p->current_display_picture = VASurfaceIDToIndex(trace_ctx, p->current_display_picture);
+#ifdef USE_CNM_TRACE_DEBUG
+                printf("%s af.current_display_picture=0x%x\n", __FUNCTION__, p->current_display_picture);
+#endif
 
+#ifdef USE_CNM_TRACE_DEBUG
+                printf("%s anchor_frames_num = %d\n", __FUNCTION__, p->anchor_frames_num);
+#endif
+                for (i=0;i<p->anchor_frames_num;i++) {
+#ifdef USE_CNM_TRACE_DEBUG
+                    printf("    bf.anchor_frames_list[%d]=0x%x\n", i, p->anchor_frames_list[i]);
+#endif
+                    p->anchor_frames_list[i] = VASurfaceIDToIndex(trace_ctx, p->anchor_frames_list[i]);
+#ifdef USE_CNM_TRACE_DEBUG
+                    printf("    af.anchor_frames_list[%d]=0x%x\n", i, p->anchor_frames_list[i]);
+#endif
+                }
+
+#ifdef USE_CNM_TRACE_DEBUG
+                printf("%s ref_frame_map \n", __FUNCTION__);
+#endif
+                for (i=0;i<8;i++) {
+#ifdef USE_CNM_TRACE_DEBUG
+                    printf("    bf.ref_frame_map[%d]=0x%x\n", i, p->ref_frame_map[i]);
+#endif
+                    p->ref_frame_map[i] = VASurfaceIDToIndex(trace_ctx, p->ref_frame_map[i]);
+#ifdef USE_CNM_TRACE_DEBUG
+                    printf("    af.ref_frame_map[%d]=0x%x\n", i, p->ref_frame_map[i]);
+#endif
+                }
+            }
+        }
         //     va_TraceAV1Buf(dpy, context, buffers[i], type, size, num_elements, pbuf + size*j);
-        // }
         break;
     default:
         break;
@@ -1463,7 +1533,7 @@ static void * VASurfaceIDToIndexInParameterBuffer(struct trace_context *trace_ct
 static void va_CNMIvfFormatBeginPicture(struct trace_context *trace_ctx)
 {
 #ifdef USE_CNM_TRACE_DEBUG
-    printf("+%s \n", __FUNCTION__);
+    printf("+%s trace_rendertarget=0x%08x\n", __FUNCTION__, trace_ctx->trace_rendertarget);
 #endif
     if (!trace_ctx) {
         return;
@@ -1537,8 +1607,8 @@ static void va_CNMIvfFormatEndPicture(struct trace_context *trace_ctx)
 static void va_CNMIvfFormatRenderBuffer(struct trace_context *trace_ctx, VABufferType type, void *data, unsigned int size, unsigned int num_elements)
 {
 #ifdef USE_CNM_TRACE_DEBUG
-    // unsigned char *ptrData = (unsigned char *)data;
-    // printf("+%s type=%d, size=%08x, num=%d, [%02x %02x %02x %02x %02x %02x %02x %02x]\n", __FUNCTION__, type, size, num_elements, ptrData[0], ptrData[1], ptrData[2], ptrData[3], ptrData[4], ptrData[5], ptrData[6], ptrData[7]);
+    unsigned char *ptrData = (unsigned char *)data;
+    printf("+%s type=%d, size=%08x, num=%d, [%02x %02x %02x %02x %02x %02x %02x %02x]\n", __FUNCTION__, type, size, num_elements, ptrData[0], ptrData[1], ptrData[2], ptrData[3], ptrData[4], ptrData[5], ptrData[6], ptrData[7]);
 #endif
 #ifdef USE_CNM_VASURFACEID_TO_IDX
     void *new_data = NULL;
@@ -1575,13 +1645,13 @@ static void va_CNMIvfFormatRenderBuffer(struct trace_context *trace_ctx, VABuffe
         trace_ctx->ivf_frame_byte_size += size; 
     }
 #ifdef USE_CNM_TRACE_DEBUG
-    // printf("-%s \n", __FUNCTION__);
+    printf("-%s \n", __FUNCTION__);
 #endif
 }
 static void va_CNMIvfFormatDestroy(struct trace_context *trace_ctx)
 {
 #ifdef USE_CNM_TRACE_DEBUG
-    printf("+%s trace_frame_no=%d\n", __FUNCTION__, trace_ctx->trace_frame_no);
+    printf("+%s trace_frame_no=%d, profile=0x%x, fourcc=0x%x\n", __FUNCTION__, trace_ctx->trace_frame_no, trace_ctx->trace_profile, vaProfileToFourcc(trace_ctx->trace_profile));
 #endif
     
     if (!trace_ctx) {

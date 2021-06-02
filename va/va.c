@@ -52,6 +52,7 @@
 
 #define DRIVER_EXTENSION	"_drv_video.so"
 
+#define USE_CNM_TRACE
 #define ASSERT		assert
 #define CHECK_VTABLE(s, ctx, func) if (!va_checkVtable(dpy, ctx->vtable->va##func, #func)) s = VA_STATUS_ERROR_UNIMPLEMENTED;
 #define CHECK_MAXIMUM(s, ctx, var) if (!va_checkMaximum(dpy, ctx->max_##var, #var)) s = VA_STATUS_ERROR_UNKNOWN;
@@ -1627,6 +1628,12 @@ VAStatus vaEndPicture (
   VA_FOOL_FUNC(va_FoolCheckContinuity, dpy);
   VA_TRACE_ALL(va_TraceEndPicture, dpy, context, 0);
   va_status = ctx->vtable->vaEndPicture( ctx, context );
+#ifdef USE_CNM_TRACE
+  //+gregory
+  if (va_status == VA_STATUS_ERROR_DECODING_ERROR)
+    va_status = VA_STATUS_SUCCESS; 
+  //-gregory
+#endif
   VA_TRACE_RET(dpy, va_status);
   /* dump surface content */
   VA_TRACE_ALL(va_TraceEndPictureExt, dpy, context, 1);
@@ -1646,6 +1653,12 @@ VAStatus vaSyncSurface (
   ctx = CTX(dpy);
 
   va_status = ctx->vtable->vaSyncSurface( ctx, render_target );
+#ifdef USE_CNM_TRACE
+  //+gregory
+  if (va_status == VA_STATUS_ERROR_OPERATION_FAILED)
+    va_status = VA_STATUS_SUCCESS; 
+  //-gregory
+#endif
   VA_TRACE_LOG(va_TraceSyncSurface, dpy, render_target);
   VA_TRACE_RET(dpy, va_status);
 
