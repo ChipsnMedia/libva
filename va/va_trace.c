@@ -1275,7 +1275,13 @@ static void * VASurfaceIDToIndexInParameterBuffer(struct trace_context *trace_ct
 #endif
                 for (i = 0; i < 16; i++) {
                     if ((p->ReferenceFrames[i].picture_id != VA_INVALID_SURFACE)) {
+#ifdef USE_CNM_TRACE_DEBUG
+                        printf("+%s ReferenceFrames[%d].picture_id=%d, pocTop=%d, pocBot=%d\n", __FUNCTION__, i, p->ReferenceFrames[i].picture_id, p->ReferenceFrames[i].TopFieldOrderCnt, p->ReferenceFrames[i].BottomFieldOrderCnt);
+#endif
                         p->ReferenceFrames[i].picture_id = VASurfaceIDToIndex(trace_ctx, p->ReferenceFrames[i].picture_id);
+#ifdef USE_CNM_TRACE_DEBUG
+                        printf("-%s ReferenceFrames[%d].picture_id=%d, pocTop=%d, pocBot=%d\n", __FUNCTION__, i, p->ReferenceFrames[i].picture_id, p->ReferenceFrames[i].TopFieldOrderCnt, p->ReferenceFrames[i].BottomFieldOrderCnt);
+#endif
                     }
                 }
             }
