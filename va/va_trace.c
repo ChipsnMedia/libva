@@ -64,7 +64,7 @@
 #endif
 
 #define USE_CNM_TRACE
-// #define USE_CNM_TRACE_DEBUG
+#define USE_CNM_TRACE_DEBUG
 #define USE_CNM_VASURFACEID_TO_IDX
 /* bionic, glibc >= 2.30, musl >= 1.3 have gettid(), so add va_ prefix */
 static pid_t va_gettid()
@@ -590,8 +590,11 @@ static int open_tracing_specil_file(
 
     strncpy(env_value, fn_env, 1024);
     env_value[1023] = '\0';
+#ifdef USE_CNM_TRACE
+#else
     FILE_NAME_SUFFIX(env_value, 1024,
         "ctx-", (unsigned int)ptra_ctx->trace_context);
+#endif
 
     fn_env = strdup(env_value);
     if(!fn_env)
@@ -996,7 +999,9 @@ static void va_TraceSurface(VADisplay dpy, VAContextID context)
 
     if (!trace_ctx->trace_fp_surface)
         return;
-
+#ifdef USE_CNM_TRACE_DEBUG
+    printf("+%s ==========dump surface data in file %s\n", __FUNCTION__, trace_ctx->trace_surface_fn);
+#endif
     va_TraceMsg(trace_ctx, "==========dump surface data in file %s\n", trace_ctx->trace_surface_fn);
 
     va_TraceMsg(trace_ctx, NULL);
@@ -1024,6 +1029,17 @@ static void va_TraceSurface(VADisplay dpy, VAContextID context)
     va_TraceMsg(trace_ctx, "\tchroma_u_offset = %d\n", chroma_u_offset);
     va_TraceMsg(trace_ctx, "\tchroma_v_offset = %d\n", chroma_v_offset);
 
+#ifdef USE_CNM_TRACE_DEBUG
+    printf("\tfourcc = 0x%08x\n", fourcc);
+    printf("\twidth = %d\n", trace_ctx->trace_frame_width);
+    printf("\theight = %d\n", trace_ctx->trace_frame_height);
+    printf("\tluma_stride = %d\n", luma_stride);
+    printf("\tchroma_u_stride = %d\n", chroma_u_stride);
+    printf("\tchroma_v_stride = %d\n", chroma_v_stride);
+    printf("\tluma_offset = %d\n", luma_offset);
+    printf("\tchroma_u_offset = %d\n", chroma_u_offset);
+    printf("\tchroma_v_offset = %d\n", chroma_v_offset);
+#endif
     if (buffer == NULL) {
         va_TraceMsg(trace_ctx, "Error:vaLockSurface return NULL buffer\n");
         va_TraceMsg(trace_ctx, NULL);
