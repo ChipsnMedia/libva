@@ -64,7 +64,7 @@
 #endif
 
 #define USE_CNM_TRACE
-#define USE_CNM_TRACE_DEBUG
+// #define USE_CNM_TRACE_DEBUG
 #define USE_CNM_VASURFACEID_TO_IDX
 /* bionic, glibc >= 2.30, musl >= 1.3 have gettid(), so add va_ prefix */
 static pid_t va_gettid()
