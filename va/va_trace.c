@@ -1110,13 +1110,18 @@ static uint32_t vaProfileToFourcc(VAProfile profile)
         break;
         // case VAProfileH264Baseline: // ‘VAProfileH264Baseline’ is deprecated 
         case VAProfileH264Main:
+            fourcc = MKTAG('A', 'V', 'C', 'M');
+            break;
         case VAProfileH264High:
+            fourcc = MKTAG('A', 'V', 'C', 'H');
+            break;
         case VAProfileH264ConstrainedBaseline:
-            fourcc = MKTAG('H', '2', '6', '4');
+        case VAProfileH264Baseline:
+            fourcc = MKTAG('A', 'V', 'C', 'B');
         break;
 #ifdef SUPPORT_CNM_CODA
         case VAProfileH264MultiviewHigh:
-            fourcc = MKTAG('H', '2', '6', '4');
+            fourcc = MKTAG('A', 'V', 'C', 'V');
         break;
 #endif
         case VAProfileVC1Simple:
