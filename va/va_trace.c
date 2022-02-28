@@ -1207,6 +1207,12 @@ static void va_CNMIvfFormatCreate(struct trace_context *trace_ctx, VASurfaceID *
     if (value) {
         strncpy(env_value, value, 1024);
         env_value[1023] = '\0';
+        if (trace_ctx->trace_entrypoint == VAEntrypointEncSlice) {
+            FILE_NAME_SUFFIX(env_value, 1024, "enc-", (unsigned int)trace_ctx->trace_context);
+        } 
+        else {
+            FILE_NAME_SUFFIX(env_value, 1024, "dec-", (unsigned int)trace_ctx->trace_context);
+        }
         trace_ctx->ivf_file = fopen(env_value, "wb");
     }
     else {
