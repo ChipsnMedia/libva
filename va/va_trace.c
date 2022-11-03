@@ -668,7 +668,6 @@ static int open_tracing_log_file(
         va_infoMessage(pva_trace->dpy, "%s %s for the thread 0x%08x\n",
             new_fn_flag ? "Open new log file" : "Append to log file",
             plog_file->fn_log, thd_id);
-
         plog_file->fp_log = pfp;
         plog_file->thread_id = thd_id;
     }
@@ -1113,6 +1112,9 @@ static uint32_t vaProfileToFourcc(VAProfile profile)
         case VAProfileH264Main:
             fourcc = MKTAG('A', 'V', 'C', 'M');
             break;
+#ifdef VA_PROFILE_H264_HIGH_10
+        case VAProfileH264High10:
+#endif
         case VAProfileH264High:
             fourcc = MKTAG('A', 'V', 'C', 'H');
             break;
@@ -1286,6 +1288,9 @@ static void * VASurfaceIDToIndexInParameterBuffer(struct trace_context *trace_ct
         //     va_TraceMPEG4Buf(dpy, context, buffers[i], type, size, num_elements, pbuf + size*j);
         // }
         break;
+#ifdef VA_PROFILE_H264_HIGH_10
+    case VAProfileH264High10:
+#endif
     case VAProfileH264Main:
     case VAProfileH264High:
     case VAProfileH264ConstrainedBaseline:
@@ -6153,6 +6158,9 @@ void va_TraceRenderPicture(
                 va_TraceMPEG4Buf(dpy, context, buffers[i], type, size, num_elements, pbuf + size*j);
             }
             break;
+#ifdef VA_PROFILE_H264_HIGH_10
+        case VAProfileH264High10:
+#endif
         case VAProfileH264Main:
         case VAProfileH264High:
         case VAProfileH264ConstrainedBaseline:

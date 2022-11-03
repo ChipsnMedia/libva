@@ -37,6 +37,9 @@ const char *vaProfileStr(VAProfile profile)
     TOSTR(VAProfileMPEG4Main);
     TOSTR(VAProfileH264Main);
     TOSTR(VAProfileH264High);
+#ifdef VA_PROFILE_H264_HIGH_10
+    TOSTR(VAProfileH264High10);
+#endif
     TOSTR(VAProfileVC1Simple);
     TOSTR(VAProfileVC1Main);
     TOSTR(VAProfileVC1Advanced);

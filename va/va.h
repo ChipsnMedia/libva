@@ -507,7 +507,18 @@ typedef enum
     VAProfileAV1Profile1                = 33,
     VAProfileHEVCSccMain444_10          = 34,
     /** \brief Profile ID used for protected video playback. */
-    VAProfileProtected                  = 35
+    VAProfileProtected                  = 35,
+
+    /**
+     * @note 'VA_PROFILE_H264_HIGH_10' is an conditional compiling option
+     * for 'VAProfileH264High10' support.
+     *
+     * Not only 'libva' is effected, the corresponding codes under 'media-driver'
+     * and 'FFmpeg' are also surrounded by '#ifdef VA_PROFILE_H264_HIGH_10 ... #endif'
+     * for the purpose of backward compatibility.
+     */
+#define VA_PROFILE_H264_HIGH_10 36
+    VAProfileH264High10                 = VA_PROFILE_H264_HIGH_10
 } VAProfile;
 
 /**
@@ -4957,6 +4968,21 @@ typedef enum
      * specify vaPutSurface render area if there is no drawable on the monitor
      */
     VADisplayAttribRenderRect          = 18,
+ /*
+     * HW attribute, read/write, specify the sub device configure
+     */
+    VADisplayAttribSubDevice           = 19,
+    /*
+     * HW attribute. read only. specify whether vaCopy support on current HW
+     * The value of each bit should equal to 1 << VA_EXEC_MODE_XXX to represent
+     * modes of vaCopy
+     */
+    VADisplayAttribCopy                 = 20,
+    /*
+     * HW attribute. read only. retrieve the device information from backend driver
+     * the value should be combined with vendor ID << 16 | device ID
+     */
+    VADisplayPCIID                      = 21,
 } VADisplayAttribType;
 
 /* flags for VADisplayAttribute */
