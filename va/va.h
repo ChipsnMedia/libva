@@ -518,7 +518,10 @@ typedef enum
      * for the purpose of backward compatibility.
      */
 #define VA_PROFILE_H264_HIGH_10 36
-    VAProfileH264High10                 = VA_PROFILE_H264_HIGH_10
+    VAProfileH264High10                 = VA_PROFILE_H264_HIGH_10,
+#define VA_PROFILE_AVS2_MAIN_10
+    VAProfileAVS2Main                   = 37,
+    VAProfileAVS2Main10                 = 38,
 } VAProfile;
 
 /**
@@ -5153,7 +5156,9 @@ typedef union _VACopyOption{
  * @return VA_STATUS_SUCCESS if successful
  */
 VAStatus vaCopy(VADisplay dpy, VACopyObject * dst, VACopyObject * src, VACopyOption option);
-
+#ifdef VA_PROFILE_AVS2_MAIN_10
+#include <va/va_dec_avs2.h>
+#endif
 #include <va/va_dec_hevc.h>
 #include <va/va_dec_jpeg.h>
 #include <va/va_dec_vp8.h>

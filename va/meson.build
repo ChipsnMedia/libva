@@ -29,6 +29,7 @@ libva_headers = [
   'va_dec_vp9.h',
   'va_dec_av1.h',
   'va_drmcommon.h',
+  'va_dec_avs2.h',
   'va_egl.h',
   'va_enc_hevc.h',
   'va_enc_h264.h',

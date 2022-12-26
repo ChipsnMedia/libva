@@ -40,6 +40,10 @@ const char *vaProfileStr(VAProfile profile)
 #ifdef VA_PROFILE_H264_HIGH_10
     TOSTR(VAProfileH264High10);
 #endif
+#ifdef VA_PROFILE_AVS2_MAIN_10
+    TOSTR(VAProfileAVS2Main);
+    TOSTR(VAProfileAVS2Main10);
+#endif
     TOSTR(VAProfileVC1Simple);
     TOSTR(VAProfileVC1Main);
     TOSTR(VAProfileVC1Advanced);

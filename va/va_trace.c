@@ -1157,6 +1157,12 @@ static uint32_t vaProfileToFourcc(VAProfile profile)
         case VAProfileAV1Profile1:
             fourcc = MKTAG('A', 'V', '1', '0');//???
         break;
+#ifdef VA_PROFILE_AVS2_MAIN_10
+        case VAProfileAVS2Main:
+        case VAProfileAVS2Main10:
+            fourcc = MKTAG('A', 'V', 'S', '2');
+        break;
+#endif
         default:
             fourcc = 0;
         break;
@@ -5881,7 +5887,27 @@ static void va_TraceVC1Buf(
         break;
     }
 }
+#ifdef VA_PROFILE_AVS2_MAIN_10
+static void va_TraceAVS2Buf(
+    VADisplay dpy,
+    VAContextID context,
+    VABufferID buffer,
+    VABufferType type,
+    unsigned int size,
+    unsigned int num_elements,
+    void *pbuf
+)
+{
+    DPY2TRACECTX(dpy, context, VA_INVALID_ID);
 
+    switch (type) {
+
+    default:
+        va_TraceVABuffers(dpy, context, buffer, type, size, num_elements, pbuf);
+        break;
+    }
+}
+#endif
 static void
 va_TraceProcFilterParameterBufferDeinterlacing(
     VADisplay dpy,
@@ -6246,6 +6272,15 @@ void va_TraceRenderPicture(
                 va_TraceAV1Buf(dpy, context, buffers[i], type, size, num_elements, pbuf + size*j);
             }
             break;
+#ifdef VA_PROFILE_AVS2_MAIN_10
+        case VAProfileAVS2Main:
+        case VAProfileAVS2Main10:
+            for (j=0; j<num_elements; j++) {
+                va_TraceMsg(trace_ctx, "\telement[%d] = \n", j);
+                va_TraceAVS2Buf(dpy, context, buffers[i], type, size, num_elements, pbuf + size*j);
+            }
+            break;
+#endif
         default:
             break;
         }
