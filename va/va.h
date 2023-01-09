@@ -522,6 +522,18 @@ typedef enum
 #define VA_PROFILE_AVS2_MAIN_10
     VAProfileAVS2Main                   = 37,
     VAProfileAVS2Main10                 = 38,
+
+    /**
+     * @note 'VA_PROFILE_AVS_DEFINED' is an conditional compiling option
+     * for 'VAProfileAVSJizhun' and 'VAProfileAVSGuangdian' support.
+     *
+     * Not only 'libva' is effected, the corresponding codes under 'media-driver'
+     * and 'FFmpeg' are also surrounded by '#ifdef VA_PROFILE_AVS_DEFINED ... #endif'
+     * for the purpose of backward compatibility.
+     */
+    #define VA_PROFILE_AVS_DEFINED
+    VAProfileAVSJizhun                  = 39,        // Chinese GB/T 20090.2—2006
+    VAProfileAVSGuangdian               = 40,        // Chinese GY/T 257.1—2012
 } VAProfile;
 
 /**
@@ -5156,6 +5168,9 @@ typedef union _VACopyOption{
  * @return VA_STATUS_SUCCESS if successful
  */
 VAStatus vaCopy(VADisplay dpy, VACopyObject * dst, VACopyObject * src, VACopyOption option);
+#ifdef VA_PROFILE_AVS_DEFINED
+#include <va/va_dec_avs.h>
+#endif
 #ifdef VA_PROFILE_AVS2_MAIN_10
 #include <va/va_dec_avs2.h>
 #endif

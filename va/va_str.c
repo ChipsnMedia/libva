@@ -44,6 +44,10 @@ const char *vaProfileStr(VAProfile profile)
     TOSTR(VAProfileAVS2Main);
     TOSTR(VAProfileAVS2Main10);
 #endif
+#ifdef VA_PROFILE_AVS_DEFINED
+    TOSTR(VAProfileAVSJizhun);
+    TOSTR(VAProfileAVSGuangdian);
+#endif
     TOSTR(VAProfileVC1Simple);
     TOSTR(VAProfileVC1Main);
     TOSTR(VAProfileVC1Advanced);
