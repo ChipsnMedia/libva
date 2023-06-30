@@ -152,6 +152,9 @@ const char *vaConfigAttribTypeStr(VAConfigAttribType configAttribType)
     TOSTR(VAConfigAttribProtectedContentCipherMode);
     TOSTR(VAConfigAttribProtectedContentCipherSampleType);
     TOSTR(VAConfigAttribProtectedContentUsage);
+    TOSTR(VAConfigAttribEncAV1);
+    TOSTR(VAConfigAttribEncAV1Ext1);
+    TOSTR(VAConfigAttribEncAV1Ext2);
     case VAConfigAttribTypeMax: break;
     }
     return "<unknown config attribute type>";

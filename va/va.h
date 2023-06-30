@@ -119,6 +119,7 @@ extern "C" {
  * 	- \ref api_enc_mpeg2
  * 	- \ref api_enc_vp8
  * 	- \ref api_enc_vp9
+ *  - \ref api_enc_av1
  * - Decoder (HEVC, JPEG, VP8, VP9, AV1)
  *      - \ref api_dec_hevc
  *      - \ref api_dec_jpeg
@@ -981,7 +982,30 @@ typedef enum
      * example, it could be \c VA_PC_USAGE_DEFAULT, \c VA_PC_USAGE_WIDEVINE, etc....
      */
     VAConfigAttribProtectedContentUsage = 49,
-
+    /**
+     * \brief AV1 encoding attribute. Read-only.
+     *
+     * This attribute exposes a number of capabilities of the underlying
+     * AV1 implementation. The attribute value is partitioned into fields as defined in the
+     * VAConfigAttribValEncAV1 union.
+     */
+    VAConfigAttribEncAV1                = 52,
+    /**
+     * \brief AV1 encoding attribute extend1. Read-only.
+     *
+     * This attribute exposes a number of capabilities of the underlying
+     * AV1 implementation. The attribute value is partitioned into fields as defined in the
+     * VAConfigAttribValEncAV1Ext1 union.
+     */
+    VAConfigAttribEncAV1Ext1            = 53,
+    /**
+     * \brief AV1 encoding attribute extend2. Read-only.
+     *
+     * This attribute exposes a number of capabilities of the underlying
+     * AV1 implementation. The attribute value is partitioned into fields as defined in the
+     * VAConfigAttribValEncAV1Ext2 union.
+     */
+    VAConfigAttribEncAV1Ext2            = 54,
     /**@}*/
     VAConfigAttribTypeMax
 } VAConfigAttribType;
