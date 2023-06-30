@@ -78,32 +78,31 @@ typedef struct _VAPictureParameterBufferAVS
     VAPictureAVS    curr_pic;
     VAPictureAVS    ref_list[2];
 
-    uint32_t width                                  : 16;
-    uint32_t height                                 : 16;
-    uint32_t mb_width                               : 16;
-    uint32_t mb_height                              : 16;
+    uint16_t width;                                             // coded width
+    uint16_t height;                                            // coded height
 
-    uint32_t picture_type                           :  2;       // VAAVSPicType
-    uint32_t progressive_seq_flag                   :  1;
-    uint32_t progressive_frame_flag                 :  1;
-    uint32_t picture_structure_flag                 :  1;       // 0:field coding, 1:frame coding
-    uint32_t fixed_pic_qp_flag                      :  1;
-    uint32_t picture_qp                             :  6;
-    uint32_t loop_filter_disable_flag               :  1;
-    uint32_t alpha_c_offset                         :  5;
-    uint32_t beta_offset                            :  5;
-    uint32_t skip_mode_flag_flag                    :  1;
-    uint32_t picture_reference_flag                 :  1;
-    uint32_t reserved_flag_1                        :  1;       // no_forward_reference_flag
-    uint32_t reserved_flag_2                        :  1;       // pb_field_enhanced_flag
-    uint32_t reserved_flag_3                        :  1;       // advanced_pred_mode_disable_flag
+    uint16_t picture_type                           :  2;       // VAAVSPicType
+    uint16_t progressive_seq_flag                   :  1;
+    uint16_t progressive_frame_flag                 :  1;
+    uint16_t picture_structure_flag                 :  1;       // 0:field coding, 1:frame coding
+    uint16_t fixed_pic_qp_flag                      :  1;
+    uint16_t picture_qp                             :  6;
+    uint16_t loop_filter_disable_flag               :  1;
+    uint16_t skip_mode_flag_flag                    :  1;
+    uint16_t picture_reference_flag                 :  1;
+    uint16_t reserved_flag_1                        :  1;       // no_forward_reference_flag
+
+    int8_t   alpha_c_offset;
+    int8_t   beta_offset;
     
     struct
     {
-        uint32_t aec_flag                           :  1;
-        uint32_t weight_quant_flag                  :  1;
-        uint32_t chroma_quant_param_delta_cb        :  6;
-        uint32_t chroma_quant_param_delta_cr        :  6;
+        uint16_t aec_flag                           :  1;
+        uint16_t weight_quant_flag                  :  1;
+        uint16_t reserved_flag_2                    :  1;       // pb_field_enhanced_flag
+        uint16_t reserved                           : 13;
+        int8_t   chroma_quant_param_delta_cb;
+        int8_t   chroma_quant_param_delta_cr;                
         uint8_t  wqm_8x8[64];
     } guangdian_fields;
 
@@ -112,7 +111,10 @@ typedef struct _VAPictureParameterBufferAVS
 } VAPictureParameterBufferAVS;
 
 /**
- * @see avs_dec_segment_t
+ * \brief AVS Slice Parameter Buffer Structure
+ *
+ * Slice data buffer of VASliceDataBufferType is used to send the bitstream data.
+ * When send AVS slice data, start code and slice header should be included.
  */
 typedef struct _VASliceParameterBufferAVS
 {
