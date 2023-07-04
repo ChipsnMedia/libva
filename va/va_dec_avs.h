@@ -80,7 +80,8 @@ typedef struct _VAPictureParameterBufferAVS
 
     uint16_t width;                                             // coded width
     uint16_t height;                                            // coded height
-
+    uint32_t mb_width                               : 16;
+    uint32_t mb_height                              : 16;
     uint16_t picture_type                           :  2;       // VAAVSPicType
     uint16_t progressive_seq_flag                   :  1;
     uint16_t progressive_frame_flag                 :  1;
