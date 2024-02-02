@@ -655,7 +655,8 @@ typedef struct  _VAEncPictureParameterBufferAV1 {
              */
             uint32_t    palette_mode_enable             : 1;
             /** \brief Reserved bytes for future use, must be zero. */
-            uint32_t    reserved                        : 18;
+            uint32_t    show_frame                      : 1;
+            uint32_t    reserved                        : 17;
         } bits;
         uint32_t value;
     } picture_flags;
